@@ -13,7 +13,7 @@ export const createContactSchema = Joi.object({
     "string.min": `"email" should have a minimum length of {#limit}`,
     "any.required": `"email" is a required field`,
   }),
-  phone: Joi.string().min(6).max(16).required().messages({
+  phone: Joi.string().trim().min(6).max(16).required().messages({
     "string.base": `"phone" should be a type of 'number'`,
     "string.empty": `"phone" cannot be an empty field`,
     "string.min": `"phone" should have a minimum length of {#limit}`,
@@ -34,7 +34,7 @@ export const updateContactSchema = Joi.object({
         "string.min": `"email" should have a minimum length of {#limit}`,
         "any.required": `"email" is a required field`,
       }),
-    phone: Joi.string().min(6).max(16).messages({
+    phone: Joi.string().trim().min(6).max(16).messages({
         "string.base": `"phone" should be a type of 'number'`,
         "string.empty": `"phone" cannot be an empty field`,
         "string.min": `"phone" should have a minimum length of {#limit}`,

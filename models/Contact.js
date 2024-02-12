@@ -27,6 +27,11 @@ const contactSchema = new Schema(
       type: Boolean,
       default: false,
     },
+    owner: {
+      type: Schema.Types.ObjectId,
+      ref: "user",
+      required: true,
+    },
   },
   { versionKey: false, timestamps: true }
 );
@@ -78,12 +83,25 @@ export const updateContactSchema = Joi.object({
   }),
   favorite: Joi.boolean().messages({
     "string.empty": `"favorite" cannot be an empty field`,
+    "string.base": `"favorite" should be a type of 'boolean'`,
   }),
 });
 
 export const contactFavoriteScheme = Joi.object({
   favorite: Joi.boolean().required().messages({
     "string.empty": `"favorite" cannot be an empty field`,
+  }),
+});
+
+export const filterContactScheme = Joi.object({
+  favorite: Joi.boolean().messages({
+    "string.base": `"favorite" should be a type of 'boolean'`,
+  }),
+  limit: Joi.number().messages({
+    "string.base": `"limit" should be a type of 'number'`,
+  }),
+  page: Joi.number().messages({
+    "string.base": `"page" should be a type of 'number'`,
   }),
 });
 

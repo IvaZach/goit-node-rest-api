@@ -2,20 +2,29 @@ import express from "express";
 import contactsControllers from "../../controllers/contacts-controllers.js";
 
 import {
+  authenticate,
   isEmptyBody,
   isEmptyOneFieldBody,
   isValidId,
 } from "../../middlewares/index.js";
-import { validateBody } from "../../decorators/index.js";
+
+import { validateBody, validateParams } from "../../decorators/index.js";
 import {
   createContactSchema,
   updateContactSchema,
   contactFavoriteScheme,
+  filterContactScheme,
 } from "../../models/Contact.js";
 
 const contactsRouter = express.Router();
 
-contactsRouter.get("/", contactsControllers.getAllContacts);
+contactsRouter.use(authenticate);
+
+contactsRouter.get(
+  "/",
+  validateParams(filterContactScheme),
+  contactsControllers.getAllContacts
+);
 
 contactsRouter.get("/:id", isValidId, contactsControllers.getOneContact);
 

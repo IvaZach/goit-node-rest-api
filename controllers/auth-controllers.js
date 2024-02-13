@@ -66,11 +66,11 @@ const getCurrent = async (req, res) => {
 
 const changeSubscription = async (req, res) => {
   const { id } = req.params;
-  const { _id, email } = req.user;
+  const { email } = req.user;
 
   const result = await User.findOneAndUpdate(id, req.body);
   notFoundResult(result);
-  res.json({ _id, email, subscription: result.subscription });
+  res.json({ email, subscription: result.subscription });
 };
 
 export default {

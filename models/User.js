@@ -19,6 +19,10 @@ const userSchema = new Schema(
       required: [true, "Password is required"],
       minLength: 6,
     },
+    avatarURL: {
+      type: String,
+      default: null,
+    },
     subscription: {
       type: String,
       enum: subscriptionList,
@@ -42,6 +46,7 @@ export const userRegisterSchema = Joi.object({
   email: Joi.string().pattern(emailRegexp).required(),
   password: Joi.string().min(6).required(),
   subscription: Joi.string().default("starter"),
+  avatarURL: Joi.string(),
 });
 
 export const userLoginSchema = Joi.object({

@@ -1,26 +1,38 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import fs from "fs/promises";
 import User from "../models/User.js";
+import gravatar from "gravatar";
+import path from "path";
+import Jimp from "jimp";
 import { HttpError, notFoundResult } from "../helpers/index.js";
 import { ctrlWrapper } from "../decorators/index.js";
 
 const { JWT_SECRET } = process.env;
+const avatarPath = path.resolve("public", "avatars");
 
 const register = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, subscription } = req.body;
+
   const user = await User.findOne({ email });
   if (user) {
     throw HttpError(409, "Email in use");
   }
 
   const hashPassword = await bcrypt.hash(password, 10);
+  const avatarURL = gravatar.url(email, { s: "250" });
 
-  const newUser = await User.create({ ...req.body, password: hashPassword });
+  const newUser = await User.create({
+    ...req.body,
+    password: hashPassword,
+    avatarURL: avatarURL,
+  });
 
   res.status(201).json({
     user: {
       email: newUser.email,
       subscription: newUser.subscription,
+      avatarURL,
     },
   });
 };
@@ -64,6 +76,27 @@ const getCurrent = async (req, res) => {
   res.json({ _id, email, subscription });
 };
 
+const changeAvatar = async (req, res) => {
+  const { _id } = req.user;
+
+  const { path: oldPath, filename } = req.file;
+
+  const newPath = path.join(avatarPath, filename);
+  await fs.rename(oldPath, newPath);
+  console.log(newPath);
+  Jimp.read(newPath, (err, image) => {
+    if (err) throw HttpError(400, "Bad path to file");
+    image.resize(250, 250).write(newPath);
+  });
+
+  const avatarURL = path.join("avatars", filename);
+
+  const result = await User.findOneAndUpdate(_id, { avatarURL });
+  notFoundResult(result);
+
+  res.json({ avatarURL });
+};
+
 const changeSubscription = async (req, res) => {
   const { id } = req.params;
   const { email } = req.user;
@@ -79,4 +112,5 @@ export default {
   logout: ctrlWrapper(logout),
   getCurrent: ctrlWrapper(getCurrent),
   changeSubscription: ctrlWrapper(changeSubscription),
+  changeAvatar: ctrlWrapper(changeAvatar),
 };

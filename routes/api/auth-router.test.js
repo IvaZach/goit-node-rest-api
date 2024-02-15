@@ -1,5 +1,7 @@
 import mongoose from "mongoose";
 import request from "supertest";
+import * as matchers from "jest-extended";
+
 import app from "../../app.js";
 import User from "../../models/User.js";
 
@@ -42,7 +44,11 @@ describe("test /api/users/login route", () => {
     expect(userData.token).toBe(body.token);
     expect(userData.subscription).toBe(body.user.subscription);
     expect(userData.email).toBe(body.user.email);
-    expect(body.user).toBe(objectContaining({email,subscription}))
-  
+    expect(body).toBeObject();
+    expect(body.user).toBeObject();
+    expect(body).toContainKey("token");
+    expect(body.user).toContainKeys(["email", "subscription"]);
+    expect(body.user.email).toBeString();
+    expect(body.user.subscription).toBeString();
   });
 });

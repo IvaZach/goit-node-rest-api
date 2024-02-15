@@ -50,5 +50,7 @@ describe("test /api/users/login route", () => {
     expect(body.user).toContainKeys(["email", "subscription"]);
     expect(body.user.email).toBeString();
     expect(body.user.subscription).toBeString();
+    expect(body.user.email).toInclude('@');
+    expect(body.user.subscription).toBeOneOf(["starter", "pro", "business"]);
   });
 });

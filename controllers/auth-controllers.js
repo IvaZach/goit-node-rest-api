@@ -79,11 +79,17 @@ const getCurrent = async (req, res) => {
 const changeAvatar = async (req, res) => {
   const { _id } = req.user;
 
+  if (req.file === undefined) {
+    throw HttpError(400, "Bad path to file");
+  }
+  
   const { path: oldPath, filename } = req.file;
+
+  console.log(req.file);
 
   const newPath = path.join(avatarPath, filename);
   await fs.rename(oldPath, newPath);
-  console.log(newPath);
+
   Jimp.read(newPath, (err, image) => {
     if (err) throw HttpError(400, "Bad path to file");
     image.resize(250, 250).write(newPath);

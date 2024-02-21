@@ -11,7 +11,8 @@ import { validateBody } from "../../decorators/index.js";
 import {
   userRegisterSchema,
   userLoginSchema,
-  userSubscriptionSchema
+  userSubscriptionSchema,
+  userEmailSchema,
 } from "../../models/User.js";
 
 const authRouter = express.Router();
@@ -21,6 +22,15 @@ authRouter.post(
   isEmptyBody,
   validateBody(userRegisterSchema),
   authControllers.register
+);
+
+authRouter.get("/verify/:verificationToken", authControllers.verify);
+
+authRouter.post(
+  "/verify",
+  isEmptyBody,
+  validateBody(userEmailSchema),
+  authControllers.resendVerify
 );
 
 authRouter.post(
@@ -48,6 +58,5 @@ authRouter.patch(
   validateBody(userSubscriptionSchema),
   authControllers.changeSubscription
 );
-
 
 export default authRouter;

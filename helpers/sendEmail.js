@@ -1,35 +1,24 @@
-import ElasticEmail from "@elasticemail/elasticemail-client";
+import nodemailer from "nodemailer";
 import "dotenv/config";
 
-const { ELASTICEMAIL_API_KEY, ELASTICEMAIL_EMAIL_FROM } = process.env;
+const { ELASTICEMAIL_SMTP_KEY, ELASTICEMAIL_EMAIL_FROM } = process.env;
 
-const defaultClient = ElasticEmail.ApiClient.instance;
-
-const { apikey } = defaultClient.authentications;
-apikey.apiKey = ELASTICEMAIL_API_KEY;
-
-const api = new ElasticEmail.EmailsApi();
-
-const email = ElasticEmail.EmailMessageData.constructFromObject({
-  Recipients: [new ElasticEmail.EmailRecipient("xogar78146@gexige.com ")],
-  Content: {
-    Body: [
-      ElasticEmail.BodyPart.constructFromObject({
-        ContentType: "HTML",
-        Content: "<strong>Test email</strong>",
-      }),
-    ],
-    Subject: "Subj:Test email",
-    From: ELASTICEMAIL_EMAIL_FROM,
+const nodemailerConfig = {
+  host: "smtp.elasticemail.com",
+  port: 2525,
+  secure: false,
+  auth: {
+    user: ELASTICEMAIL_EMAIL_FROM,
+    pass: ELASTICEMAIL_SMTP_KEY,
   },
-});
-
-const callback = function (error, data, response) {
-  if (error) {
-    console.error(error);
-  } else {
-    console.log("API called successfully.");
-  }
 };
 
-api.emailsPost(email, callback);
+const transport = nodemailer.createTransport(nodemailerConfig);
+
+
+const sendEmail = data => {
+    const email = {...data, from: ELASTICEMAIL_EMAIL_FROM};
+    return transport.sendMail(email)
+}
+
+export default sendEmail;

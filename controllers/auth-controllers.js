@@ -1,4 +1,3 @@
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import fs from "fs/promises";
 import User from "../models/User.js";
@@ -8,6 +7,7 @@ import Jimp from "jimp";
 import { nanoid } from "nanoid";
 import { HttpError, notFoundResult, sendEmail } from "../helpers/index.js";
 import { ctrlWrapper } from "../decorators/index.js";
+import bcryptjs from "bcryptjs";
 
 const { JWT_SECRET, BASE_URL } = process.env;
 const avatarPath = path.resolve("public", "avatars");
@@ -20,7 +20,7 @@ const register = async (req, res) => {
     throw HttpError(409, "Email in use");
   }
 
-  const hashPassword = await bcrypt.hash(password, 10);
+  const hashPassword = await bcryptjs.hash(password, 10);
   const verificationToken = nanoid();
 
   const avatarURL = gravatar.url(email, { s: "250" });
@@ -95,7 +95,7 @@ const login = async (req, res) => {
   if (!user.verify) {
     throw HttpError(401, "Email not verify");
   }
-  const passwordCompare = await bcrypt.compare(password, user.password);
+  const passwordCompare = await bcryptjs.compare(password, user.password);
   if (!passwordCompare) {
     throw HttpError(401, "Password is wrong");
   }
